@@ -6,14 +6,16 @@
   <!--
   ╔══════════════════════════════════════════════════════════════════════╗
   ║         SECURITY AWARENESS DEMONSTRATION — DanG Security             ║
-  ║         github.com/[your-handle] | dangsecurity.com                  ║
+  ║                 | github.com/daniel-gallagher |                      ║
   ║                                                                      ║
   ║  THREE-STAGE SOCIAL ENGINEERING DEMONSTRATION                        ║
   ║  Stage 1: False urgency / identity confirmation                      ║
   ║  Stage 2: False authority via fabricated "privileged" access logs    ║
   ║  Stage 3: Educational reveal with live fingerprint data              ║
   ║                                                                      ║
-  ║  NO DATA IS COLLECTED, STORED, OR TRANSMITTED AT ANY POINT.          ║
+  ║  PLEASE NOTE: NO DATA IS COLLECTED, STORED, OR TRANSMITTED           ║
+  ║  OUTSIDE OF THE BROWSER AT ANY POINT!                                ║
+  ║                                                                      ║
   ║  The email field and log checkboxes are purely cosmetic.             ║
   ║  The IP/geo data shown on page 3 is fetched client-side and          ║
   ║  displayed only in your browser — it goes nowhere.                   ║
@@ -49,6 +51,8 @@
       --g-border:  #dadce0;
       --g-bg:      #f2f2f2;
       --g-white:   #ffffff;
+      --g-indigo:  #3730a3;
+      --g-indigo-bg: #e8e7f5;
     }
 
     body {
@@ -647,14 +651,24 @@
     .dtile-value { font-size: 13px; font-family: 'Roboto Mono', monospace; color: var(--g-text); word-break: break-all; line-height: 1.4; }
     .dtile-value.pending { color: #9aa0a6; font-style: italic; font-family: Roboto, Arial, sans-serif; }
 
-    /* Psych mechanics grid */
-    .psych-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    /* Psych mechanics grid — 2 columns so the two Stage 1 tiles occupy row 1
+       cleanly and the four Stage 2 tiles fill the rows beneath. The stage
+       boundary then falls between rows instead of mid-row. */
+    .psych-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 
     .psych-tile {
       background: var(--g-bg);
       border-radius: 8px;
       padding: 18px 20px;
       border-top: 3px solid var(--g-blue);
+    }
+
+    /* Stage 2 tiles (3rd onward) get a deeper indigo accent so the two
+       Stage 1 tiles in row 1 are visually distinct from the Stage 2 group. */
+    .psych-tile:nth-child(n+3) { border-top-color: var(--g-indigo); }
+    .psych-tile:nth-child(n+3) .mechanic-label {
+      color: var(--g-indigo);
+      background: var(--g-indigo-bg);
     }
 
     .psych-tile h3 { font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--g-text); }
@@ -776,16 +790,17 @@
 <!-- ══════════════════════════════════════════════════════════════════════
      PAGE 1 — STAGE 1: URGENCY + IDENTITY CONFIRMATION
      No data is captured here. The email field value is only used on
-     the next page to display back to the user for psychological effect.
+     page 2 to be displayed back to the user for psychological effect.
      ══════════════════════════════════════════════════════════════════════ -->
 <div id="page-phish">
   <header class="g-header">
     <img src="https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"
          alt="Google" style="height:24px;">
+    <!-- The links below simply point to the actual Google URLs to make the page feel legitimate. There is an opportunity to link to nefarious copies though. -->
     <nav class="g-header-links">
-      <a href="#">Gmail</a>
-      <a href="#">Images</a>
-      <a href="#" class="btn-signin">Sign in</a>
+      <a href="https://mail.google.com/mail/u/0/">Gmail</a>
+      <a href="https://drive.google.com/drive/u/0/home">Drive</a>
+      <a href="https://accounts.google.com/ServiceLogin?hl=en&passive=true&continue=https://www.google.com/" class="btn-signin">Sign in</a>
     </nav>
   </header>
 
@@ -843,7 +858,8 @@
           <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
         </svg>
         <div class="auth-note-text">
-          <strong>NOTE: Please keep in mind that password entry will NEVER occur on account verification pages.</strong>
+          <!-- Fake security guidance to try and reduce any suspicion that something is off. -->
+          <strong>NOTE: Password entry will NEVER occur on account verification pages.</strong>
           You will always authenticate directly with Google's servers AFTER the initial review of your account activity.
         </div>
       </div>
@@ -867,15 +883,15 @@
      The log entries are generated from real browser fingerprint data
      to make "familiar" rows feel personalized.
      The email entered on page 1 is displayed in the account chip.
-     Nothing is submitted or transmitted anywhere.
+     Nothing is submitted or transmitted anywhere. But it could have...
      ══════════════════════════════════════════════════════════════════════ -->
 <div id="page-logs" class="hidden">
   <header class="g-header">
     <img src="https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"
          alt="Google" style="height:24px;">
     <nav class="g-header-links">
-      <a href="#">Gmail</a>
-      <a href="#">Images</a>
+      <a href="https://mail.google.com/mail/u/0/">Gmail</a>
+      <a href="https://drive.google.com/drive/u/0/home">Drive</a>
       <a href="#" class="btn-signin">Sign in</a>
     </nav>
   </header>
@@ -976,14 +992,14 @@
     <span class="stop-icon">🛑</span>
     <h1>You Just Completed a 3-Stage Phishing Attack</h1>
     <p>
-      This is a <strong>non-functional security awareness demonstration</strong> by DanG Security.
-      Nothing was collected or transmitted at any stage. But let's walk through what just happened —
+      This is a <strong>non-functional security awareness demonstration</strong>.
+      Nothing was collected or transmitted at any stage outside of your borowser. Let's walk through what just happened though —
       because it's more disturbing than you may realize.
     </p>
     <div class="stage-pills">
       <span class="stage-pill">Stage 1 · Urgency &amp; Email Confirmation</span>
       <span class="stage-pill">Stage 2 · False Authority via Fake Logs</span>
-      <span class="stage-pill">Stage 3 · You Are Here</span>
+      <span class="stage-pill">Stage 3 · Attacker Steals Credentials --> (YOU ARE HERE)</span>
     </div>
   </div>
 
@@ -993,15 +1009,15 @@
     <div class="rcard">
       <div class="rcard-head">
         <span class="icon">🕵️</span>
-        <h2>What Was Collected — Before You Clicked Anything</h2>
+        <h2>What Was Obtained — Before You Clicked Anything</h2>
         <span class="chip">Passive · No consent required</span>
       </div>
       <div class="rcard-body">
         <p class="section-intro">
-          The data below was collected the instant your browser loaded this page —
-          before any form interaction, before any button click. This is the standard browser API
-          exposure available to every website. A real attacker could use this data just like we did on the previoius page to pre-populate
-          the "access logs" with your actual browser info and home IP address. This can make the log events feel legitimate and unmistakably like <em>your</em> account history.
+          The data below was obtained the instant your browser loaded this page —
+          before any form interaction, before any button click. This is the standard browser identifying
+          content available to every website. A real attacker could easily use this data, just like we did on the previoius page, to pre-populate
+          the "access logs" with your actual browser info and home IP address. This can make the log events feel legitimate and unmistakably like <em>your actual</em> account history.
         </p>
         <div class="data-grid">
           <div class="dtile"><div class="dtile-label">IP Address</div><div class="dtile-value pending" id="d-ip">Fetching…</div></div>
@@ -1037,28 +1053,28 @@
           Each stage of what you just experienced was engineered to exploit a specific,
           well-documented cognitive principle. These aren't tricks for the gullible —
           they are techniques that consistently work on security professionals,
-          IT administrators, and executives. Understanding the mechanics is the only defense.
+          IT administrators, and executives. Understanding and becoming familiar with the mechanics is the best defense.
         </p>
         <div class="psych-grid">
           <div class="psych-tile">
             <div class="mechanic-label">Stage 1 · Urgency</div>
-            <h3>System 1 Override</h3>
+            <h3>"System 1" Override</h3>
             <p>Urgency and fear suppress the prefrontal cortex's deliberate reasoning ("System 2") and activate the faster, pattern-matching amygdala response ("System 1"). The goal isn't to fool your logic — it's to prevent your logic from activating at all. "Someone in Nigeria is in your account right now" is designed to make you act before you think.</p>
           </div>
           <div class="psych-tile">
-            <div class="mechanic-label">Stage 1 · Authority</div>
+            <div class="mechanic-label">Stage 1 · Trust Signals</div>
             <h3>Institutional Impersonation</h3>
-            <p>Google's own logo, loaded from Google's own CDN, on a URL that says google.com in the address bar, with a valid Google TLS certificate. Every visual and technical trust signal your brain uses to evaluate legitimacy was present. The page <em>is</em> hosted by Google. There was no lie to detect on those dimensions.</p>
+            <p>Google's own logo and color scheme, loaded from Google's own CDN, on a URL that says google.com in the address bar, with a valid Google TLS certificate. Every visual and technical trust signal your brain uses to evaluate legitimacy was present. The page <em>is</em> hosted by Google. There was no lie to detect on those dimensions.</p>
           </div>
           <div class="psych-tile">
-            <div class="mechanic-label">Stage 2 · False Authority</div>
+            <div class="mechanic-label">Stage 2 · False Ally</div>
             <h3>The Privileged Data Illusion</h3>
-            <p>When you saw a table of access logs containing your real browser, your real operating system, and an approximate version of your location — you thought "they have my correct data." That belief established that this page already has administrative access to your account further reinforcing the legitimacy. In reality, the "familiar" rows were only fabricated from the browser fingerprint passively collected when you first loaded the page just moments prior.</p>
+            <p>The alert framed Google and you as teammates against a common enemy — the "attacker" in Lagos. Then the access logs showed your real browser, your real operating system, and your actual location, which sealed the partnership: surely only a trusted insider with genuine access to your account could show you that. So when this "ally" asked you to help flag the suspicious entries, you weren't being interrogated by a stranger — you were collaborating with a partner you'd already started to trust. In reality, the "familiar" rows were fabricated from the browser fingerprint silently collected the instant you loaded the first page, and the only adversary in the room was the ally itself.</p>
           </div>
           <div class="psych-tile">
             <div class="mechanic-label">Stage 2 · Commitment</div>
             <h3>Foot-in-the-Door</h3>
-            <p>Checking boxes on the log table was a small, low-stakes action. But it was an action — a commitment. Cialdini's consistency principle predicts that once people make a small commitment, they're significantly more likely to make a larger, consistent one. You already participated in verifying your email address and then the access log security review. Now, a final "enter your password to take immediate action" prompt would feel like the natural completion of something you already started.</p>
+            <p>Checking boxes on the log table was a small, low-stakes action. But it was an action — a commitment. Cialdini's consistency principle predicts that once people make a small commitment, they're significantly more likely to make a larger, consistent one. You already participated in verifying your email address and then flagging unusual access logs for a security review. Now, a final "enter your password to initiate immediate action" prompt would feel like the natural completion of something you already started.</p>
           </div>
           <div class="psych-tile">
             <div class="mechanic-label">Stage 2 · Anchoring</div>
