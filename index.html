@@ -752,6 +752,28 @@
 
     /* Attack anatomy steps */
     .steps { display: flex; flex-direction: column; gap: 20px; }
+
+    /* Asymmetry banner — the "cheap to build, costly to victims" gut-punch */
+    .asymmetry {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .asym-item {
+      background: var(--g-bg);
+      border-radius: 8px;
+      border-top: 3px solid var(--g-red);
+      padding: 16px 14px;
+      text-align: center;
+    }
+    .asym-num { font-size: 22px; font-weight: 700; color: var(--g-text); line-height: 1.1; margin-bottom: 4px; }
+    .asym-label { font-size: 12px; color: var(--g-sub); line-height: 1.4; }
+    @media (max-width: 700px) {
+      .asymmetry { grid-template-columns: 1fr; gap: 8px; }
+      .asym-item { display: flex; align-items: baseline; gap: 10px; text-align: left; }
+      .asym-num { margin-bottom: 0; min-width: 78px; }
+    }
     .step { display: flex; gap: 16px; align-items: flex-start; }
     .step-num { width: 30px; height: 30px; min-width: 30px; background: var(--g-blue); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
     .step-num.red { background: var(--g-red); }
@@ -1023,7 +1045,7 @@
       </div>
       <div class="rcard-body">
         <p class="section-intro">
-          The data below was obtained the instant your browser loaded this page —
+          The data below was captured the instant your browser loaded this page —
           before any form interaction, before any button click. This is the standard browser identifying
           content available to every website. A real attacker could easily use this data, just like we did on the previoius page, to pre-populate
           the "access logs" with your actual browser info and home IP address. This can make the log events feel legitimate and unmistakably like <em>your actual</em> account history.
@@ -1208,68 +1230,71 @@
       </div>
     </div>
 
-    <!-- 5. ATTACK ANATOMY -->
+    <!-- 5. THE ATTACKER'S SIDE -->
     <div class="rcard">
       <div class="rcard-head">
         <span class="icon">⚔️</span>
-        <h2>Attack Anatomy — The Full Kill Chain</h2>
+        <h2>The Attacker's Side — How Little This Took to Build</h2>
       </div>
       <div class="rcard-body">
+        <p class="section-intro">
+          You've seen this from the inside — what it felt like to be the target. Here's the other
+          vantage point: what it actually takes to <em>build</em> an attack like this. The unsettling
+          part isn't the sophistication. It's how cheap, fast, and accessible the whole thing is.
+        </p>
+
+        <div class="asymmetry">
+          <div class="asym-item"><div class="asym-num">~15 min</div><div class="asym-label">to assemble, start to finish</div></div>
+          <div class="asym-item"><div class="asym-num">$0</div><div class="asym-label">total cost to the attacker</div></div>
+          <div class="asym-item"><div class="asym-num">0</div><div class="asym-label">special tools or skills required</div></div>
+        </div>
+
         <div class="steps">
           <div class="step">
             <div class="step-num">1</div>
             <div class="step-body">
-              <strong>Attacker creates a free throwaway Gmail account</strong>
-              <p>4 minutes. $0. No identity verification. The <code>/view/</code> prefix is exclusive to personal Gmail — not Workspace. Ironically it produces a URL that looks more like an internal Google property than the Workspace equivalent which embeds your org domain.</p>
+              <strong>Register a throwaway Gmail account</strong>
+              <p>A few minutes, no payment, no identity check. This single free account is the only
+              "infrastructure" the attacker needs — and it's what unlocks the <code>/view/</code> URL prefix
+              that makes the page look like a native Google property.</p>
             </div>
           </div>
           <div class="step">
             <div class="step-num">2</div>
             <div class="step-body">
-              <strong>Claims a high-trust slug — no review, no waitlist</strong>
-              <p><code>/view/access-logs</code>, <code>/view/security-alert</code>, <code>/view/account-recovery</code> — first come, first served. Permanently. For free. The slug is the entire attack surface. Once claimed it cannot be removed without a Google manual intervention.</p>
+              <strong>Claim a trustworthy-sounding address</strong>
+              <p>Slugs like <code>/view/access-logs</code> or <code>/view/security-alert</code> are handed out
+              first-come, first-served with no review, no vetting, and no reservation system. Whatever sounds
+              official and is still available becomes the attacker's — permanently, and for free.</p>
             </div>
           </div>
           <div class="step">
             <div class="step-num">3</div>
             <div class="step-body">
-              <strong>Builds the phishing flow in Google Sites</strong>
-              <p>No-code WYSIWYG builder. Copies Google's fonts, colors, layout. Embeds Google's own logo assets loaded from <code>gstatic.com</code> — so resource requests in proxy logs look like Google talking to Google. Hosts a passive fingerprinting script to collect geo, browser, and device data on page load.</p>
+              <strong>Assemble the page in a drag-and-drop editor</strong>
+              <p>No code, no design skill. Google's real logos and fonts load straight from Google's own CDN,
+              so even a security team inspecting network traffic sees nothing but Google talking to Google.
+              A short fingerprinting snippet is the only custom piece — and you've already seen how small that is.</p>
             </div>
           </div>
           <div class="step">
             <div class="step-num">4</div>
             <div class="step-body">
-              <strong>Delivers via spear-phishing email</strong>
-              <p>Urgent "Critical Security Alert" email — Google-branded, possibly sent via a Google product (Forms, Calendar invite, Docs share) for added legitimacy. The embedded link is a real google.com URL, so it passes SafeLinks, Proofpoint, and any URL scanner relying on domain reputation.</p>
+              <strong>Send the lure</strong>
+              <p>An urgent, Google-branded email — sometimes delivered <em>through</em> a real Google product like
+              a Calendar invite or Docs share to add legitimacy. Because every link points at a genuine
+              google.com address, it sails past the email filters and link scanners that decide what's safe
+              by checking domain reputation.</p>
             </div>
           </div>
           <div class="step">
             <div class="step-num red">5</div>
             <div class="step-body">
-              <strong>Stage 2 deploys the privileged data illusion</strong>
-              <p>Using the passively collected browser fingerprint and geolocation data, the attacker generates a fake access log table populated with the victim's real browser, OS, and approximate city. The victim sees their own data reflected back and concludes the page has administrative access to their account. This is the moment trust transfers completely.</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num red">6</div>
-            <div class="step-body">
-              <strong>Victim makes their first commitment</strong>
-              <p>Selecting and submitting "unrecognized" log entries is a low-friction action, but it's a commitment. The victim has now actively participated in the security process. Cialdini's consistency principle means subsequent asks — confirm your password, enter your recovery phone, provide the 2FA code — feel like logical continuations of something already in progress.</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num red">7</div>
-            <div class="step-body">
-              <strong>Harvests credentials via AiTM proxy or direct collection</strong>
-              <p>Against SMS or TOTP-based 2FA, an Adversary-in-the-Middle proxy relays credentials to the real Google in real time, stealing the authenticated session cookie before 2FA can stop it. Against accounts with hardware keys (FIDO2/passkeys), this attack chain fails at this step — the key will not authenticate to a non-canonical origin.</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num red">8</div>
-            <div class="step-body">
-              <strong>Account takeover and silent redirect</strong>
-              <p>With a valid session cookie, the attacker has full account access. The victim is silently redirected to the real <code>myaccount.google.com</code> — which looks like "the verification worked." From here: email exfiltration, OAuth app persistence for long-term access, lateral movement to any SSO-connected application, or credential resale.</p>
+              <strong>Wait for one trusting click</strong>
+              <p>Everything after that — the urgency, the fake logs, the small commitment, the credential
+              prompt — runs on its own, exactly as you just experienced it. The payoff for those 15 minutes
+              of setup can be a fully hijacked account, and from there: inbox access, connected apps, and a
+              foothold into everything that account can reach. <strong>The defenses below are what break this chain.</strong></p>
             </div>
           </div>
         </div>
