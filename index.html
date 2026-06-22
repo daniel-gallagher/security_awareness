@@ -712,6 +712,14 @@
       line-height: 1.85;
       overflow-x: auto;
       color: #cdd6f4;
+      /* white-space: pre-wrap preserves the newlines and indentation written
+         in the source (a plain div collapses them into single spaces, which
+         is what flattened the code into one unreadable paragraph). pre-wrap
+         also lets long lines wrap cleanly instead of forcing horizontal
+         scroll on narrow screens. tab-size keeps indentation compact. */
+      white-space: pre-wrap;
+      word-break: break-word;
+      tab-size: 2;
     }
 
     .c-cm { color: #585b70; }
