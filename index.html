@@ -1024,7 +1024,7 @@
     <h1>You Just Completed a 3-Stage Phishing Attack</h1>
     <p>
       This is a <strong>non-functional security awareness demonstration</strong>.
-      Nothing was collected or transmitted at any stage outside of your borowser. Let's walk through what just happened though —
+      Nothing was collected or transmitted at any stage outside of your browser. Let's walk through what just happened though —
       because it's more disturbing than you may realize.
     </p>
     <div class="stage-pills">
@@ -1045,7 +1045,7 @@
       </div>
       <div class="rcard-body">
         <p class="section-intro">
-          The data below was captured the instant your browser loaded this page —
+          The data below was captured the instant your browser loaded the first page —
           before any form interaction, before any button click. This is the standard browser identifying
           content available to every website. A real attacker could easily use this data, just like we did on the previoius page, to pre-populate
           the "access logs" with your actual browser info and home IP address. This can make the log events feel legitimate and unmistakably like <em>your actual</em> account history.
@@ -1294,7 +1294,7 @@
               <p>Everything after that — the urgency, the fake logs, the small commitment, the credential
               prompt — runs on its own, exactly as you just experienced it. The payoff for those 15 minutes
               of setup can be a fully hijacked account, and from there: inbox access, connected apps, and a
-              foothold into everything that account can reach. <strong>The defenses below are what break this chain.</strong></p>
+              foothold into everything that account can reach. <strong>The defenses below can help break this chain.</strong></p>
             </div>
           </div>
         </div>
@@ -1312,8 +1312,8 @@
           <li class="protect-item">
             <span class="protect-icon">🔑</span>
             <div>
-              <h3>FIDO2 hardware keys or passkeys — the only phishing-resistant 2FA</h3>
-              <p>Hardware keys (YubiKey, Google Titan) and device passkeys cryptographically bind authentication to the exact origin. They will not authenticate a session on <code>sites.google.com</code> for credentials stored for <code>accounts.google.com</code>. SMS OTPs and TOTP codes do not have this property — they are relayed by an AiTM proxy in real time.</p>
+              <h3>FIDO2 hardware keys or passkeys — one of the only phishing-resistant 2FA methods</h3>
+              <p>Hardware keys (YubiKey, Google Titan, etc) and device passkeys cryptographically bind authentication to the exact origin. They will not authenticate a session on <code>sites.google.com</code> for credentials stored for <code>accounts.google.com</code>. SMS OTPs and TOTP codes do not have this property — they can be intercepted by an AiTM (Attacker in the Middle) proxy in real time.</p>
             </div>
           </li>
           <li class="protect-item">
@@ -1358,8 +1358,8 @@
   </div>
 
   <footer class="attrib">
-    Security Awareness Demonstration · <a href="https://dangsecurity.com" target="_blank" rel="noopener">DanG Security</a><br>
-    No data was collected, stored, or transmitted at any point during this demonstration.<br>
+    Security Awareness Demonstration · <a href="https://twitter.com/DanielGallagher" target="_blank" rel="noopener">DanG Security</a><br>
+    No data was collected or stored outside of your browser at any point during this demonstration.<br>
     <code>https://sites.google.com/view/access-logs</code> · Built to prove a point, not to cause harm.
   </footer>
 
