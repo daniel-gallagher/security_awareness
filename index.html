@@ -1317,17 +1317,10 @@
             </div>
           </li>
           <li class="protect-item">
-            <span class="protect-icon">🔒</span>
-            <div>
-              <h3>Google's Advanced Protection Program</h3>
-              <p>Requires two hardware keys. Enforces stricter OAuth app restrictions and account recovery controls. For high-value targets — executives, security professionals, journalists — this is non-negotiable. Enrollment at <code>landing.google.com/advancedprotection</code>.</p>
-            </div>
-          </li>
-          <li class="protect-item">
             <span class="protect-icon">🧩</span>
             <div>
-              <h3>Use a password manager — it knows what your eyes miss</h3>
-              <p>Password managers bind credential autofill to the exact origin. They will not autofill <code>sites.google.com</code> with credentials saved for <code>accounts.google.com</code>. If your password manager hesitates, your brain should stop completely.</p>
+              <h3>A password manager's silence is the signal — not its autofill</h3>
+              <p>Passkeys are the protection that works; this is the one everyone <em>thinks</em> works — and it's the rule that got me. A manager only fills credentials on the domain where you saved them, so against a crude lookalike like <code>g00gle-secure.com</code> it simply stays silent — and that silence is a real warning worth heeding. But managers match on the <em>registrable domain</em> (<code>google.com</code>), not the full hostname. <code>sites.google.com</code> and <code>accounts.google.com</code> share that root, so the manager treats them as the same site and will autofill your real Google password straight into an attacker's page. That asymmetry <em>is</em> the lesson: a <strong>refusal</strong> to fill is trustworthy, but a <strong>successful</strong> fill proves only that the domains matched — never that the page is safe.</p>
             </div>
           </li>
           <li class="protect-item">
@@ -1349,6 +1342,13 @@
             <div>
               <h3>Recognize the commitment trap</h3>
               <p>If you've already taken a small action on a page (checked boxes, confirmed an email, answered a question), notice that you've been primed. The natural instinct is to continue — because stopping feels inconsistent with what you just did. Stop anyway. Consistency is a feature of trustworthy behavior, not a reason to ignore warning signs.</p>
+            </div>
+          </li>
+          <li class="protect-item">
+            <span class="protect-icon">🔒</span>
+            <div>
+              <h3>For high-value accounts, enroll in Google's Advanced Protection Program</h3>
+              <p>The most aggressive option, and the most effective. It requires two hardware keys, enforces stricter OAuth app restrictions, and hardens account recovery against social engineering. It's deliberately demanding to set up — but for executives, security professionals, journalists, activists, and anyone whose account is a high-value target, it's the strongest protection Google offers. Enrollment at <code>landing.google.com/advancedprotection</code>.</p>
             </div>
           </li>
         </ul>
